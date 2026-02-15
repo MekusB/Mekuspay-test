@@ -1,0 +1,52 @@
+name: Deploy Frontend to EC2
+
+on:
+  push:
+    branches:
+      - main
+    # paths:
+    #   - 'app/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check SSH connection
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |  
+            echo "SSH connection successful"  
+            whoami  
+
+      - name: Deploy Frontend via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            set -e  # Exit immediately on any error
+
+            cd /var/www/mekuspay
+
+            # Pull latest code cleanly
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Rebuild ONLY the frontend image from source
+            # --no-cache is optional; remove it if builds are slow and you trust layer caching
+            docker-compose -f docker-compose.yml build --no-cache frontend
+            
+
+            # Restart ONLY the frontend container
+            # --no-deps ensures dependent services are NOT touched
+            docker-compose -f docker-compose.yml up -d --no-deps frontend
+
+            # Verify the container is running and healthy
+            sleep 5
+            docker-compose -f docker-compose.yml ps frontend
+
+            echo "Frontend deployment completed successfully."
