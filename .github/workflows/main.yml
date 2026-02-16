@@ -29,8 +29,9 @@ jobs:
             set -e  # Exit immediately on any error
             cd /var/www/mekuspay/Mekuspay-test
             # Pull latest code cleanly
-            git fetch origin main
-            git reset --hard origin/main
+            # git fetch origin main
+            # git reset --hard origin/main
+            git pull origin main 
 
       - name: Remove old container
         uses: appleboy/ssh-action@v1.0.3
