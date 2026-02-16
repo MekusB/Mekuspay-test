@@ -38,19 +38,19 @@ jobs:
 
             # Rebuild ONLY the frontend image from source
             # --no-cache is optional; remove it if builds are slow and you trust layer caching
-            # docker-compose -f docker-compose.yml build --no-cache production-app-1
-            docker-compose -f /var/www/mekuspay/Mekuspay-test/app/production/docker-compose.yml build --no-cache production-app-1
+            # docker-compose -f docker-compose.yml build --no-cache app
+            docker-compose -f /var/www/mekuspay/Mekuspay-test/app/production/docker-compose.yml build --no-cache app
             
             
 
             # Restart ONLY the frontend container
             # --no-deps ensures dependent services are NOT touched
-            # docker-compose -f docker-compose.yml up -d --no-deps production-app-1
-            docker-compose -f /var/www/mekuspay/Mekuspay-test/app/production/docker-compose.yml up -d --no-deps production-app-1
+            # docker-compose -f docker-compose.yml up -d --no-deps app
+            docker-compose -f /var/www/mekuspay/Mekuspay-test/app/production/docker-compose.yml up -d --no-deps app
 
             # Verify the container is running and healthy
             sleep 5
-            # docker-compose -f docker-compose.yml ps production-app-1
-            docker-compose -f /var/www/mekuspay/Mekuspay-test/app/production/docker-compose.yml ps production-app-1
+            # docker-compose -f docker-compose.yml ps app
+            docker-compose -f /var/www/mekuspay/Mekuspay-test/app/production/docker-compose.yml ps app
             
-            echo "production-app-1 deployment completed successfully."
+            echo "app deployment completed successfully."
