@@ -1,12 +1,10 @@
 name: Deploy Frontend to EC2
-
 on:
   push:
     branches:
       - main
     # paths:
     #   - 'app/**'
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -21,6 +19,19 @@ jobs:
             echo "SSH connection successful"  
             whoami  
 
+      - name: Pull latest code cleanly
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            set -e  # Exit immediately on any error
+            cd /var/www/mekuspay/Mekuspay-test
+            # Pull latest code cleanly
+            git fetch origin main
+            git reset --hard origin/main
+
       - name: Deploy Frontend via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -29,28 +40,19 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             set -e  # Exit immediately on any error
-
-            cd /var/www/mekuspay/Mekuspay-test
-
-            # Pull latest code cleanly
-            git fetch origin main
-            git reset --hard origin/main
-
             # Rebuild ONLY the frontend image from source
             # --no-cache is optional; remove it if builds are slow and you trust layer caching
-            # docker-compose -f docker-compose.yml build --no-cache app
-            docker-compose -f /var/www/mekuspay/Mekuspay-test/app/production/docker-compose.yml build --no-cache app
+            # docker compose -f docker-compose.yml build --no-cache app
+            docker compose -f /var/www/mekuspay/Mekuspay-test/app/production/docker-compose.yml build --no-cache app
             
             
-
             # Restart ONLY the frontend container
             # --no-deps ensures dependent services are NOT touched
-            # docker-compose -f docker-compose.yml up -d --no-deps app
-            docker-compose -f /var/www/mekuspay/Mekuspay-test/app/production/docker-compose.yml up -d --no-deps app
-
+            # docker compose -f docker-compose.yml up -d --no-deps app
+            docker compose -f /var/www/mekuspay/Mekuspay-test/app/production/docker-compose.yml up -d --no-deps app
             # Verify the container is running and healthy
             sleep 5
-            # docker-compose -f docker-compose.yml ps app
-            docker-compose -f /var/www/mekuspay/Mekuspay-test/app/production/docker-compose.yml ps app
+            # docker compose -f docker-compose.yml ps app
+            docker compose -f /var/www/mekuspay/Mekuspay-test/app/production/docker-compose.yml ps app
             
             echo "app deployment completed successfully."
