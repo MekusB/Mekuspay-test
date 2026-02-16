@@ -30,7 +30,7 @@ jobs:
           script: |
             set -e  # Exit immediately on any error
 
-            cd /var/www/mekuspay
+            cd /var/www/mekuspay/Mekuspay-test
 
             # Pull latest code cleanly
             git fetch origin main
