@@ -32,6 +32,15 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
+      - name: Remove old container
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            docker compose -f /var/www/mekuspay/Mekuspay-test/app/production/docker-compose.yml down app || true
+
       - name: Deploy Frontend via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
